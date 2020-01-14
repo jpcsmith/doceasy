@@ -18,7 +18,7 @@ setup(
 
     # Automatically extract version information from git tags
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools_scm', 'wheel'],
 
     # This should be your name or the name of the organization which owns the
     # project.
