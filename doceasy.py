@@ -22,6 +22,23 @@ def positive_int(value: str):
     return integer
 
 
+class AtLeast:
+    """Validator to ensure that the argument is at least the value
+    specified in the constructor.
+    """
+    def __init__(self, min_value):
+        self.min_value = min_value
+
+    def validate(self, value):
+        """Attempt to validate the provided value."""
+        if value < self.min_value:
+            raise SchemaError(f"The value should be at least {self.min_value}")
+        return value
+
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, str(self.min_value))
+
+
 class File:
     """Validator that creates file objects for command line files or '-'.
     """
