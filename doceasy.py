@@ -1,10 +1,20 @@
 """Helper functions and classes for using docopt and schema"""
 import sys
 import csv
-from typing import IO, Optional
+import typing
+from typing import IO
 
 from docopt import docopt
-from schema import SchemaError, Use, And, Schema
+from schema import (
+    SchemaError, And, Schema, Regex, Optional, Use, Forbidden, Const,
+    Literal, Or
+)
+
+__all__ = [
+    'Schema', 'And', 'Or', 'Regex', 'Optional', 'Use', 'Forbidden',
+    'Const', 'Literal', 'PositiveInt', 'positive_int', 'AtLeast', 'doceasy',
+    'CsvFile',
+]
 
 
 PositiveInt = And(Use(int), lambda n: n >= 1,
@@ -42,12 +52,12 @@ class AtLeast:
 class File:
     """Validator that creates file objects for command line files or '-'.
     """
-    def __init__(self, mode: str = 'r', default: Optional[str] = None):
+    def __init__(self, mode: str = 'r', default: typing.Optional[str] = None):
         assert 'b' not in mode
         self.mode = mode
         self.default = default
 
-    def validate(self, filename: Optional[str]) -> IO:
+    def validate(self, filename: typing.Optional[str]) -> IO:
         """Validate the filename and return the associated file object."""
         filename = filename or self.default
 
@@ -74,7 +84,7 @@ class CsvFile(File):
         super().__init__(*args, **kwargs)
         self.dict_args = dict_args
 
-    def validate(self, filename: Optional[str]):
+    def validate(self, filename: typing.Optional[str]):
         stream = super().validate(filename)
 
         if any(m in self.mode for m in ['w', 'a', 'x']):
@@ -101,7 +111,7 @@ def _rename_arguments(arguments: dict):
     }
 
 
-def doceasy(docstring: str, schema: Optional[Schema] = None,
+def doceasy(docstring: str, schema: typing.Optional[Schema] = None,
             rename: bool = True, **kwargs) -> dict:
     """Parse the command line arguments."""
     arguments = docopt(docstring, **kwargs)
