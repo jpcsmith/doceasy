@@ -25,7 +25,7 @@ setup(
     setup_requires=['setuptools_scm', 'wheel'],
     install_requires=['docopt', 'schema'],
     extras_require={
-        'dev': [],
-        'test': [],
+        'dev': ["pylint", "flake8", "mypy"],
+        'test': ["pytest"],
     }
 )
