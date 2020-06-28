@@ -79,6 +79,13 @@ class Mapping:
             raise SchemaError(
                 f"Invalid mapping string for callables {map_string}") from err
 
+    @staticmethod
+    def to_string(mapping) -> str:
+        """Convert the mapping to a string parsable by a Mapping
+        validator.
+        """
+        return ",".join(f"{key}={value}" for key, value in mapping.items())
+
 
 class File:
     """Validator that creates file objects for command line files or '-'.
