@@ -1,4 +1,5 @@
 """Helper functions and classes for using docopt and schema"""
+# pylint: disable=too-few-public-methods
 import sys
 import csv
 import typing
@@ -47,6 +48,36 @@ class AtLeast:
 
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, str(self.min_value))
+
+
+class Mapping:
+    """Validator that creates mappings.
+
+    The parameters kt_callable and vt_callable if provided should be
+    callables, such as "int", returning the desired type.  If only
+    kt_callable is provided it is used to conver the value in the
+    mapping.  If both are provided kt_callable converts the key and
+    vt_callable converts the value.
+    """
+    def __init__(self, kt_callable=None, vt_callable=None):
+        if vt_callable is None:
+            self._kt_callable = str
+            self._vt_callable = kt_callable or str
+        else:
+            assert kt_callable is not None
+            self._kt_callable = kt_callable
+            self._vt_callable = vt_callable
+
+    def validate(self, map_string: str) -> typing.Dict[str, typing.Any]:
+        """Validate and extract the mapping."""
+        try:
+            items = [key_val.split("=", maxsplit=1)
+                     for key_val in map_string.split(",")]
+            return {self._kt_callable(key): self._vt_callable(value)
+                    for key, value in items}
+        except ValueError as err:
+            raise SchemaError(
+                f"Invalid mapping string for callables {map_string}") from err
 
 
 class File:
