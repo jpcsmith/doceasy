@@ -91,18 +91,19 @@ class File:
     """Validator that creates file objects for command line files or '-'.
     """
     def __init__(self, mode: str = 'r', default: typing.Optional[str] = None):
-        assert 'b' not in mode
         self.mode = mode
         self.default = default
 
     def validate(self, filename: typing.Optional[str]) -> IO:
         """Validate the filename and return the associated file object."""
         filename = filename or self.default
+        stdout = sys.stdout.buffer if 'b' in self.mode else sys.stdout
+        stdin = sys.stdin.buffer if 'b' in self.mode else sys.stdin
 
         if filename == '-':
             if any(m in self.mode for m in ['w', 'a', 'x']):
-                return sys.stdout
-            return sys.stdin
+                return stdout  # type: ignore
+            return stdin  # type: ignore
 
         if filename is None:
             raise SchemaError("Invalid object to create a file: '{filename}'")
@@ -149,11 +150,16 @@ def _rename_arguments(arguments: dict):
     }
 
 
-def doceasy(docstring: str, schema: typing.Optional[Schema] = None,
-            rename: bool = True, **kwargs) -> dict:
+def doceasy(
+    docstring: str,
+    schema: typing.Union[Schema, typing.Dict, None] = None,
+    rename: bool = True, **kwargs
+) -> dict:
     """Parse the command line arguments."""
     arguments = docopt(docstring, **kwargs)
 
+    if isinstance(schema, dict):
+        schema = Schema(schema)
     if schema is not None:
         arguments = _validate(arguments, schema)
 

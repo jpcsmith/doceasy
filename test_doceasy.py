@@ -1,7 +1,7 @@
 """Tests for doceasy."""
 import schema
 import pytest
-from doceasy import Mapping
+from doceasy import Mapping, File
 
 
 def test_mapping_str():
@@ -32,3 +32,15 @@ def test_mapping_to_string():
     assert Mapping.to_string({"a": 1, "b": 2}) == "a=1,b=2"
     assert Mapping(int).validate(Mapping.to_string({"a": 1, "b": 2})) == {
         "a": 1, "b": 2}
+
+
+def test_file_open_stdout_binary_mode(capsys):
+    """It should open stdout in binary mode."""
+    handle = File(mode="w").validate("-")
+
+    with pytest.raises(TypeError):
+        handle.write(b"Hello World")
+
+    handle = File(mode="wb").validate("-")
+    handle.write(b"Hello World Bytes")
+    assert capsys.readouterr().out == "Hello World Bytes"
