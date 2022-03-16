@@ -145,7 +145,7 @@ def _validate(arguments: dict, schema: Schema) -> dict:
 
 def _rename_arguments(arguments: dict):
     return {
-        key.lower().strip('-').replace('-', '_'): value
+        key.lower().strip('-<>').replace('-', '_'): value
         for key, value in arguments.items()
     }
 
